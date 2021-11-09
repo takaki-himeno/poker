@@ -5,8 +5,8 @@ import "./style.css";
 
 var allCards = [];
 var myCards = [];
-var targetList = myCards;
 var boardCards = [];
+var targetList = myCards;
 var mode = 'mc';
 var ranks = _.range(1, 14);
 var suits = ['s', 'd', 'h', 'c'];
@@ -114,41 +114,44 @@ function contains(list, card) {
 function renderCards() {
 	var targetSelector = '.' + mode;
 	var targetList = (mode === 'mc') ? myCards : boardCards;
-	clearDisp(targetSelector);
+	clearDestributedCards(targetSelector);
 	_.each(targetList, function(card, i) {
 		$('.' + mode + '-' + (i+1)).attr({
 			'data-rank': card.r,
 			'data-suit': card.s
 		}).text(dispCard(card));
 	});
+	console.log(myCards, boardCards);
 }
 
 // 初期化
 function init() {
 	myCards.length = 0;
 	boardCards.length = 0;
-	$('#mode-mc').prop('checked', true);
 	$('.' + CLASS.SELECTED).removeClass(CLASS.SELECTED);
 	mode = 'mc';
-	changeTitle();
-	clearDisp(); 
+	selectCorrectList()
+	changeTitleColor();
+	clearDestributedCards();
 }
 
+// ヘッドライの帯の色を変えてどちらが選択されているのか可視化
 function changeTitleColor() {
 	$('.hl-cards').removeClass(CLASS.SELECTED);
 	$('.hl-cards.' + mode).addClass(CLASS.SELECTED);
 }
 
-function clearDisp(selector) {
+// 場のカードの表示を初期化
+function clearDestributedCards(selector) {
 	if(!selector) {
 		selector = '.card-l.mc, .card-l.bc'
 	} else {
 		selector += '.card-l';
 	}
-	$(selector).removeAttr('data-rank').removeAttr('data-suit').empty();
+	$(selector).removeAttr('data-rank').removeAttr('data-suit').text('blank');
 }
 
-// カードタップされたら
+// パレットのカードタップされたら
 $('.card').click(function(e) {
 console.log(mode);
 	var limNum = (mode === 'mc') ? 2 : 5;
@@ -172,8 +175,16 @@ console.log(mode);
 				return true;
 			}
 		});
-	} 
+	}
 	renderCards();
+
+	// モード自動切り替え
+	if(mode === 'mc' && myCards.length === 2 && boardCards.length < 5) {
+		changeMode('bc');
+	}
+	else if(mode === 'bc' && boardCards.length === 0 && myCards.length < 2) {
+		changeMode('mc');	
+	}
 });
 
 // モード切替押された
@@ -182,13 +193,27 @@ $('.hl-cards, .card-l').click(function() {
 	changeMode(newMode);
 });
 
+// 場のカードタップされた
+$('.card-l').click(function() {
+	if(!$(this).data('rank')) return;
+	var targetMode = $(this).hasClass('mc') ? 'mc' : 'bc';
+	changeMode(targetMode);
+	console.log($(this).index());
+	var targetCard = targetList.splice($(this).index(), 1);
+	$('.card[data-rank="' + targetCard[0].r + '"][data-suit="' + targetCard[0].s + '"]').removeClass(CLASS.SELECTED);
+	renderCards();
+});
+
+function selectCorrectList() {
+	targetList = (mode === 'mc') ? myCards : boardCards;
+}
+
 function changeMode(newMode) {
 	mode = newMode;
-	targetList = (mode === 'mc') ? myCards : boardCards;
+	selectCorrectList();
 	changeTitleColor();
 }
 
-// // リセットボタン押されたら
-// $('#reset').on('click', function() {
-// 	init();
-// });
+$('#reset').click(function() {
+	init();
+});
