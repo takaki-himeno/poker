@@ -5,11 +5,15 @@ import "./style.css";
 
 var allCards = [];
 var myCards = [];
-var tableCards = [];
-var mode;
+var targetList = myCards;
+var boardCards = [];
+var mode = 'mc';
 var ranks = _.range(1, 14);
 var suits = ['s', 'd', 'h', 'c'];
 
+var CLASS = {
+	SELECTED: 'selected'
+};
 
 // Util
 // todo: 将来独立ファイルにする
@@ -107,31 +111,84 @@ function contains(list, card) {
 	});
 }
 
-$('.card').on('click', function(e) {
+function renderCards() {
+	var targetSelector = '.' + mode;
+	var targetList = (mode === 'mc') ? myCards : boardCards;
+	clearDisp(targetSelector);
+	_.each(targetList, function(card, i) {
+		$('.' + mode + '-' + (i+1)).attr({
+			'data-rank': card.r,
+			'data-suit': card.s
+		}).text(dispCard(card));
+	});
+}
+
+// 初期化
+function init() {
+	myCards.length = 0;
+	boardCards.length = 0;
+	$('#mode-mc').prop('checked', true);
+	$('.' + CLASS.SELECTED).removeClass(CLASS.SELECTED);
+	mode = 'mc';
+	changeTitle();
+	clearDisp(); 
+}
+
+function changeTitleColor() {
+	$('.hl-cards').removeClass(CLASS.SELECTED);
+	$('.hl-cards.' + mode).addClass(CLASS.SELECTED);
+}
+
+function clearDisp(selector) {
+	if(!selector) {
+		selector = '.card-l.mc, .card-l.bc'
+	} else {
+		selector += '.card-l';
+	}
+	$(selector).removeAttr('data-rank').removeAttr('data-suit').empty();
+}
+
+// カードタップされたら
+$('.card').click(function(e) {
+console.log(mode);
+	var limNum = (mode === 'mc') ? 2 : 5;
 	var $ct = $(e.currentTarget);
+	var isSelected = $ct.hasClass(CLASS.SELECTED);
 	var tappedCard = {
 		r: $ct.data('rank'),
 		s: $ct.data('suit')
 	};
-	if(myCards.length < 2 && !contains(myCards, tappedCard)) {
-		myCards.push(tappedCard);
-		$ct.addClass('selected');
+	if(targetList.length < limNum && !isSelected) {
+		targetList.push(tappedCard);
+		$ct.addClass(CLASS.SELECTED + ' ' + mode);
 	}
-	else if(contains(myCards, tappedCard)) {
-		_.some(myCards, function(myCard, i) {
-			if(isSameCards(myCard, tappedCard)) {
-				myCards.splice(i, 1);
-				$ct.removeClass('selected');
+	else if(isSelected) {
+		var newMode = $ct.hasClass('mc') ? 'mc' : 'bc';
+		changeMode(newMode);
+		_.some(targetList, function(targetCard, i) {
+			if(isSameCards(targetCard, tappedCard)) {
+				targetList.splice(i, 1);
+				$ct.removeClass(CLASS.SELECTED).removeClass(mode);
 				return true;
 			}
 		});
 	} 
-	renderMyCards();
+	renderCards();
 });
 
-function renderMyCards() {
-	$('.mc').empty();
-	_.each(myCards, function(card, i) {
-		$('.my-card-' + (i+1)).text(dispCard(card));
-	});
+// モード切替押された
+$('.hl-cards, .card-l').click(function() {
+	var newMode = $(this).hasClass('mc') ? 'mc' : 'bc';
+	changeMode(newMode);
+});
+
+function changeMode(newMode) {
+	mode = newMode;
+	targetList = (mode === 'mc') ? myCards : boardCards;
+	changeTitleColor();
 }
+
+// // リセットボタン押されたら
+// $('#reset').on('click', function() {
+// 	init();
+// });

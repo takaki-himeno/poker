@@ -13,6 +13,7 @@
 .palette {
 	border-collapse:  collapse;
 }
+
 .card {
 	border:  1px solid #999;
 	border-radius: 5px;
@@ -20,23 +21,35 @@
 	margin:  10px;
 	text-align: center;
 }
+[data-suit="d"] {
+	color: green;
+}
+[data-suit="s"] {
+	color: black;
+}
+[data-suit="c"] {
+	color: blue;
+}
+[data-suit="h"] {
+	color: red;
+}
 .selected {
 	color: #aaa;
 }
-
-.my-cards-wrapper,
-.table-cards-wrapper {
+.hl-cards.selected {
+	background: #ccf;
+}
+.mc-wrapper,
+.bc-wrapper {
 	display:  flex;
 }
-.card-l {
+.card-l.mc,
+.card-l.bc {
 	border: solid 2px #666;
 	padding: 25px;
 	width: 30px;
 	height: 50px;
 	text-align: center;
 	margin: 10px;
-	border-radius: 3px;
-}
-[data-suit="d"] {
-	color: green;
+	border-radius: 5px;
 }
