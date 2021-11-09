@@ -1,6 +1,42 @@
-.display {
-	width: 640px;
+.wrapper {
+	width: 1280px;
 	margin: 0 auto;
 	border: 1px solid #eee;
 	border-radius: 5px;
+	display: flex;
+
+}
+.display {
+	width: 600px;
+	margin-left: 40px;
+}
+.palette {
+	border-collapse:  collapse;
+}
+.card {
+	border:  1px solid #999;
+	border-radius: 5px;
+	padding: 25px 15px;
+	margin:  10px;
+	text-align: center;
+}
+.selected {
+	color: #aaa;
+}
+
+.my-cards-wrapper,
+.table-cards-wrapper {
+	display:  flex;
+}
+.card-l {
+	border: solid 2px #666;
+	padding: 25px;
+	width: 30px;
+	height: 50px;
+	text-align: center;
+	margin: 10px;
+	border-radius: 3px;
+}
+[data-suit="d"] {
+	color: green;
 }
