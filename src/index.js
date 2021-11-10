@@ -133,6 +133,7 @@ function init() {
 	selectCorrectList()
 	changeTitleColor();
 	clearDestributedCards();
+	onChangeCards();
 }
 
 // ヘッドライの帯の色を変えてどちらが選択されているのか可視化
@@ -176,7 +177,7 @@ console.log(mode);
 			}
 		});
 	}
-	renderCards();
+	onChangeCards();
 
 	// モード自動切り替え
 	if(mode === 'mc' && myCards.length === 2 && boardCards.length < 5) {
@@ -195,14 +196,16 @@ $('.hl-cards, .card-l').click(function() {
 
 // 場のカードタップされた
 $('.card-l').click(function() {
-	if(!$(this).data('rank')) return;
+	if(!$(this).attr('data-rank')) return; // セットされていなければ何もしない
 	var targetMode = $(this).hasClass('mc') ? 'mc' : 'bc';
 	changeMode(targetMode);
 	console.log($(this).index());
 	var targetCard = targetList.splice($(this).index(), 1);
 	$('.card[data-rank="' + targetCard[0].r + '"][data-suit="' + targetCard[0].s + '"]').removeClass(CLASS.SELECTED);
-	renderCards();
+	onChangeCards();
 });
+
+
 
 function selectCorrectList() {
 	targetList = (mode === 'mc') ? myCards : boardCards;
@@ -217,3 +220,28 @@ function changeMode(newMode) {
 $('#reset').click(function() {
 	init();
 });
+
+
+
+function onChangeCards() {
+	renderCards();
+	calcProbabilities();
+}
+
+function calcProbabilities() {
+	// calcRSF();
+	// calcSF();
+	// calcFOAK();
+	// calcfh();
+	// calcFH();
+	// calcF()
+	// calcTOAK();
+	// calcTP();
+	// calcOP();
+	// calcHC();
+console.log($('.res').length);
+	_.each($('.res'), function(res, i) {
+		console.log($(res).val());
+		$(res).val(_.random(0, 45) * (10 - i) * .2);
+	})
+}
